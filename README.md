@@ -58,7 +58,15 @@ Check out the live version of this project here: [Wordle Remake](<http://rapidon
 
 
 ## Errors:
-- Know of an Error and Want to report it? Please open a Issue, describe your issue, along side the steps to recreate it and then I will look into the issue and fix it. 
+- Know of an Error and Want to report it? Please open a Issue,  TITLE IT **" ISSUE "**
+ describe your issue, along side the steps to recreate it and then I will look into the issue and fix it. 
+
+
+## Future Updates:
+-[ ] Score Keeper (logs to browser cookies, share with friends, etc)
+-[ ] Online Leaderboard (new tab at the top)
+- Want anything added? Open an Issue, title it " **FEATURE ADDITION** " 
+
 
 ## Contributing
 
