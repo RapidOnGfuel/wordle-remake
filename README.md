@@ -12,7 +12,7 @@ A simple Wordle clone created using HTML, CSS, and JavaScript. This project allo
 
 
 #### (Nerd Features)
-- Hashing for custom codes so that no one can know what word you gave them
+- Hashing for custom codes so that no one can know what word you gave them. (Base64 lol)
 - Only allow one hint per page, making sure no one gets more than one at one given time.
 - Invalid Word detection (ensuring users cant just spam letters)
 - Color coding based on guess (Green = Right Spot , Yellow = Wrong Spot , Grey = Wrong Letter)
