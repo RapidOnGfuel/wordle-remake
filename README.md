@@ -7,14 +7,21 @@ A simple Wordle clone created using HTML, CSS, and JavaScript. This project allo
 
 - Guess a five-letter word with feedback on correct letters and positions.
 - Randomized hints to help you if you're stuck.
-- Custom words and code generation for sharing with friends.
+- Code generation for sharing custom words with friends.
 - Responsive design and smooth user interface.
+
+
+#### (Nerd Features)
+- Hashing for custom codes so that no one can know what word you gave them
+- Only allow one hint per page, making sure no one gets more than one at one given time.
+- Invalid Word detection (ensuring users cant just spam letters)
+- Color coding based on guess (Green = Right Spot , Yellow = Wrong Spot , Grey = Wrong Letter)
 
 ## Getting Started
 
 ### Prerequisites
 
-To run this project locally, you need to have Python installed to start a simple HTTP server.
+To run this project locally, you need to have [Python](<https://www.python.org/downloads/>) installed to start a simple HTTP server.
 
 ### Installation
 
@@ -24,7 +31,7 @@ To run this project locally, you need to have Python installed to start a simple
    cd Wordle-Remake
    ```
 
-2. **Start a local server**:
+2. **Start a local server** (same place where you did cd Wordle-Remake):
 
    - **Using Python 3**:
      ```bash
@@ -47,11 +54,11 @@ To run this project locally, you need to have Python installed to start a simple
 
 ## Check it out
 
-Check out the live version of this project here!: [Wordle Remake](<http://rapidongfuel.github.io/wordle-remake/>)
+Check out the live version of this project here: [Wordle Remake](<http://rapidongfuel.github.io/wordle-remake/>)
 
 ## Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
+Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes, and then include what you changed.
 
 ## License
 
