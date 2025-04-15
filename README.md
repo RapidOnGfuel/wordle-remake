@@ -28,7 +28,7 @@ To run this project locally, you need to have [Python](<https://www.python.org/d
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/RapidOnGfuel/wordle-remake
-   cd Wordle-Remake
+   cd wordle-remake
    ```
 
 2. **Start a local server** (same place where you did cd Wordle-Remake):
