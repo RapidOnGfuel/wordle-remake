@@ -56,6 +56,10 @@ To run this project locally, you need to have [Python](<https://www.python.org/d
 
 Check out the live version of this project here: [Wordle Remake](<http://rapidongfuel.github.io/wordle-remake/>)
 
+
+#### Known Errors:
+- Custom words only apply to the premade dictionary, say for example you make the word AAAAA, it wont accept it as an answer since its not a valid word in the premade dictionary. 
+- Know of an Error and Want to report it? Please open a Issue, describe your issue, along side the steps to recreate it and then I will look into the issue and fix it. 
 ## Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes, and then include what you changed.
