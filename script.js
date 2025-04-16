@@ -2,17 +2,46 @@ let words = [];
 let targetWord = "";
 let currentGuess = "";
 let currentRow = 0;
-let hint = null;
-let isCustomGame = false;
+const keyboardLayout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 
 // Fetch words from words.txt
 fetch('words.txt')
     .then(response => response.text())
     .then(data => {
         words = data.split('\n').map(word => word.trim().toUpperCase()).filter(word => word.length === 5);
-        newRandomWord(); // Initialize with a random word after loading
+        newRandomWord();
     })
     .catch(error => console.error('Error loading words:', error));
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupKeyboard();
+    setupBoard();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    document.getElementById('generate-code-button').addEventListener('click', generateCode);
+    document.getElementById('start-game-button').addEventListener('click', startGame);
+    document.getElementById('new-random-word-button').addEventListener('click', newRandomWord);
+}
+
+function setupKeyboard() {
+    const keyboard = document.getElementById('keyboard');
+    keyboard.innerHTML = '';
+
+    keyboardLayout.forEach(row => {
+        const rowElement = document.createElement('div');
+        rowElement.classList.add('keyboard-row');
+        for (let char of row) {
+            const key = document.createElement('div');
+            key.classList.add('key');
+            key.innerText = char;
+            key.addEventListener('click', () => handleKeyPress(char));
+            rowElement.appendChild(key);
+        }
+        keyboard.appendChild(rowElement);
+    });
+}
 
 function generateCode() {
     const wordInput = document.getElementById('word-input').value.toUpperCase();
@@ -29,19 +58,14 @@ function startGame() {
     const decodedWord = decodeCode(codeInput);
     if (decodedWord) {
         targetWord = decodedWord;
-        isCustomGame = true;
     } else {
         targetWord = getRandomWord();
-        isCustomGame = false;
     }
-    hint = null; // Reset hint for a new game
     setupBoard();
 }
 
 function newRandomWord() {
     targetWord = getRandomWord();
-    isCustomGame = false;
-    hint = null; // Reset hint for a new game
     setupBoard();
 }
 
@@ -78,9 +102,14 @@ function setupBoard() {
         }
     }
     document.querySelector(`[data-row='0'][data-index='0']`).focus();
+}
 
-    const hintButton = document.getElementById('hint-button');
-    hintButton.addEventListener('click', showHint);
+function handleKeyPress(char) {
+    const activeBox = document.querySelector(`[data-row='${currentRow}'] .letter-box:empty`);
+    if (activeBox) {
+        activeBox.innerText = char;
+        handleInput({target: activeBox});
+    }
 }
 
 function handleInput(event) {
@@ -98,7 +127,6 @@ function handleInput(event) {
     }
 
     currentGuess = currentGuess.substring(0, index) + char + currentGuess.substring(index + 1);
-
     currentGuess = currentGuess.padEnd(5, ' ');
 
     if (char && index < 4) {
@@ -116,7 +144,7 @@ function handleKeyDown(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
         const guess = currentGuess.trim().toUpperCase();
-        if (guess.length === 5 && (isCustomGame || words.includes(guess))) {
+        if (guess.length === 5 && words.includes(guess)) {
             checkGuess();
         } else {
             showInvalidMessage();
@@ -145,67 +173,35 @@ function showInvalidMessage() {
     }, 2000);
 }
 
-function showHint() {
-    if (!hint) {
-        const hintIndex = Math.floor(Math.random() * targetWord.length);
-        hint = `The ${hintIndex + 1}${getOrdinalSuffix(hintIndex + 1)} letter is "${targetWord[hintIndex]}"`;
-    }
-    const hintPopup = document.createElement('div');
-    hintPopup.id = 'hint-popup';
-    hintPopup.innerHTML = `<p>${hint}</p><button onclick="closeHint()">Close</button>`;
-    document.body.appendChild(hintPopup);
-    hintPopup.classList.add('show');
-}
-
-function closeHint() {
-    const hintPopup = document.getElementById('hint-popup');
-    if (hintPopup) {
-        hintPopup.remove();
-    }
-}
-
-function getOrdinalSuffix(n) {
-    if (n === 1) return 'st';
-    if (n === 2) return 'nd';
-    if (n === 3) return 'rd';
-    return 'th';
-}
-
 function checkGuess() {
     const boxes = document.querySelectorAll(`[data-row='${currentRow}']`);
-    const feedback = [];
     const targetWordArray = targetWord.split('');
     const guessArray = currentGuess.split('');
 
-    // First pass: Check for correct positions (green)
     for (let i = 0; i < 5; i++) {
         const char = guessArray[i];
         const box = boxes[i];
 
         if (char === targetWordArray[i]) {
             box.classList.add('green');
-            feedback.push('green');
-            targetWordArray[i] = null; // Mark this letter as used
-            guessArray[i] = null; // Mark this guess position as processed
+            targetWordArray[i] = null;
+            guessArray[i] = null;
         }
     }
 
-    // Second pass: Check for correct letters in wrong positions (yellow)
     for (let i = 0; i < 5; i++) {
         const char = guessArray[i];
         const box = boxes[i];
 
         if (char && targetWordArray.includes(char)) {
             box.classList.add('yellow');
-            feedback.push('yellow');
-            targetWordArray[targetWordArray.indexOf(char)] = null; // Mark this letter as used
+            targetWordArray[targetWordArray.indexOf(char)] = null;
         } else if (char) {
             box.classList.add('gray');
-            feedback.push('gray');
         }
     }
 
-    document.getElementById('feedback').innerText = feedback.join(' ');
+    updateKeyboardColors();
 
     if (currentGuess.trim() === targetWord) {
         alert("Congratulations! You've guessed the word!");
@@ -222,4 +218,27 @@ function checkGuess() {
     } else {
         alert(`Game over! The word was: ${targetWord}`);
     }
+}
+
+function updateKeyboardColors() {
+    const keys = document.querySelectorAll('.key');
+    keys.forEach(key => {
+        const char = key.innerText;
+        key.classList.remove('green', 'yellow', 'gray');
+
+        if (currentGuess.includes(char)) {
+            if (targetWord.includes(char)) {
+                key.classList.add('yellow');
+            }
+            for (let i = 0; i < 5; i++) {
+                if (targetWord[i] === char && currentGuess[i] === char) {
+                    key.classList.remove('yellow');
+                    key.classList.add('green');
+                    break;
+                }
+            }
+        } else {
+            key.classList.add('gray');
+        }
+    });
 }
