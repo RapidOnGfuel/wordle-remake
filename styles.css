@@ -153,3 +153,32 @@ input, button {
     user-select: none;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
+
+.hint-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    display: none;
+    width: 300px;
+    text-align: center;
+}
+
+.hint-popup.show {
+    display: block;
+}
+
+.close-button {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+}

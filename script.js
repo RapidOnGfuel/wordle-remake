@@ -2,6 +2,9 @@ let words = [];
 let targetWord = "";
 let currentGuess = "";
 let currentRow = 0;
+let isCustomWord = false; // Flag to indicate if a custom word is being used
+let hintGiven = false;
+let hintMessage = '';
 const keyboardLayout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 
 // Fetch words from words.txt
@@ -12,71 +15,126 @@ fetch('words.txt')
         newRandomWord();
     })
     .catch(error => console.error('Error loading words:', error));
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        setupKeyboard();
-        setupBoard();
-        setupEventListeners();
-        loadStreak();
-    
-        const menuButton = document.getElementById('menu-button');
-        const dropdownMenu = document.getElementById('dropdown-menu');
-    
-        menuButton.addEventListener('click', function() {
-            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-        });
-    
-        // Close the dropdown if clicked outside
-        window.addEventListener('click', function(event) {
-            if (!menuButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-                dropdownMenu.style.display = 'none';
-            }
-        });
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupKeyboard();
+    setupBoard();
+    setupEventListeners();
+    loadStreak();
+
+    const menuButton = document.getElementById('menu-button');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    menuButton.addEventListener('click', function() {
+        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
     });
-    
-    let streak = 0;
-    
-    function loadStreak() {
-        const savedStreak = localStorage.getItem('wordle-streak');
-        streak = savedStreak ? parseInt(savedStreak, 10) : 0;
-        updateStreakDisplay();
-        console.log(`Loaded streak: ${streak}`);
-    }
-    
-    function updateStreakDisplay() {
-        const feedback = document.getElementById('feedback');
-        feedback.innerText = `Current Streak: ${streak}`;
-    }
-    
-    function checkGuess() {
-        if (currentGuess.trim() === targetWord) {
-            alert("Congratulations! You've guessed the word!");
-            streak++;
-            localStorage.setItem('wordle-streak', streak);
-            updateStreakDisplay();
-            console.log(`Streak incremented: ${streak}`);
-        } else if (currentRow < 5) {
-            currentRow++;
-            currentGuess = '';
-            const nextRowBoxes = document.querySelectorAll(`[data-row='${currentRow}']`);
-            nextRowBoxes.forEach(box => {
-                box.contentEditable = true;
-                box.addEventListener('input', handleInput);
-                box.addEventListener('keydown', handleKeyDown);
-            });
-            nextRowBoxes[0].focus();
-        } else {
-            alert(`Game over! The word was: ${targetWord}`);
-            streak = 0;
-            localStorage.setItem('wordle-streak', streak);
-            updateStreakDisplay();
-            console.log(`Streak reset: ${streak}`);
+
+    // Close the dropdown if clicked outside
+    window.addEventListener('click', function(event) {
+        if (!menuButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.style.display = 'none';
+        }
+    });
+});
+
+let streak = 0;
+
+function loadStreak() {
+    const savedStreak = localStorage.getItem('wordle-streak');
+    streak = savedStreak ? parseInt(savedStreak, 10) : 0;
+    updateStreakDisplay();
+    console.log(`Loaded streak: ${streak}`);
+}
+
+function updateStreakDisplay() {
+    const feedback = document.getElementById('feedback');
+    feedback.innerText = `Current Streak: ${streak}`;
+}
+
+function checkGuess() {
+    const boxes = document.querySelectorAll(`[data-row='${currentRow}']`);
+    const targetWordArray = targetWord.split('');
+    const guessArray = currentGuess.split('');
+
+    // First pass: check for correct positions
+    for (let i = 0; i < 5; i++) {
+        const char = guessArray[i];
+        const box = boxes[i];
+
+        if (char === targetWordArray[i]) {
+            box.classList.add('green');
+            targetWordArray[i] = null;
+            guessArray[i] = null;
         }
     }
+
+    // Second pass: check for present but misplaced letters
+    for (let i = 0; i < 5; i++) {
+        const char = guessArray[i];
+        const box = boxes[i];
+
+        if (char && targetWordArray.includes(char)) {
+            box.classList.add('yellow');
+            targetWordArray[targetWordArray.indexOf(char)] = null;
+        } else if (char) {
+            box.classList.add('gray');
+        }
+    }
+
+    updateKeyboardColors();
+
+    if (currentGuess.trim() === targetWord) {
+        alert("Congratulations! You've guessed the word!");
+        streak++;
+        localStorage.setItem('wordle-streak', streak);
+        updateStreakDisplay();
+    } else if (currentRow < 5) {
+        currentRow++;
+        currentGuess = '';
+        const nextRowBoxes = document.querySelectorAll(`[data-row='${currentRow}']`);
+        nextRowBoxes.forEach(box => {
+            box.contentEditable = true;
+            box.addEventListener('input', handleInput);
+            box.addEventListener('keydown', handleKeyDown);
+        });
+        nextRowBoxes[0].focus();
+    } else {
+        alert(`Game over! The word was: ${targetWord}`);
+        streak = 0;
+        localStorage.setItem('wordle-streak', streak);
+        updateStreakDisplay();
+    }
+}
+
 function setupEventListeners() {
     document.getElementById('generate-code-button').addEventListener('click', generateCode);
     document.getElementById('start-game-button').addEventListener('click', startGame);
     document.getElementById('new-random-word-button').addEventListener('click', newRandomWord);
+    document.getElementById('hint-button').addEventListener('click', provideHint);
+    document.getElementById('close-hint').addEventListener('click', closeHintPopup); // Close button listener
+}
+
+function provideHint() {
+    if (!hintGiven) {
+        const randomPosition = Math.floor(Math.random() * 5); // Random number between 0 and 4
+        const letter = targetWord[randomPosition];
+        const ordinalNumbers = ["1st", "2nd", "3rd", "4th", "5th"];
+        hintMessage = `The ${ordinalNumbers[randomPosition]} letter is ${letter}`;
+        hintGiven = true;
+    }
+    displayHintPopup(hintMessage);
+}
+
+function displayHintPopup(message) {
+    const hintPopup = document.getElementById('hint-popup');
+    const hintMessageElement = document.getElementById('hint-message');
+    hintMessageElement.innerText = message;
+    hintPopup.classList.add('show');
+}
+
+function closeHintPopup() {
+    const hintPopup = document.getElementById('hint-popup');
+    hintPopup.classList.remove('show');
 }
 
 function setupKeyboard() {
@@ -112,15 +170,20 @@ function startGame() {
     const decodedWord = decodeCode(codeInput);
     if (decodedWord) {
         targetWord = decodedWord;
+        isCustomWord = true; // Set flag for custom word
     } else {
         targetWord = getRandomWord();
+        isCustomWord = false; // Reset flag if not a custom word
     }
     setupBoard();
+    hintGiven = false; // Reset hint flag for new game
 }
 
 function newRandomWord() {
     targetWord = getRandomWord();
+    isCustomWord = false; // Reset flag for random word
     setupBoard();
+    hintGiven = false; // Reset hint flag for new game
 }
 
 function decodeCode(code) {
@@ -198,7 +261,7 @@ function handleKeyDown(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
         const guess = currentGuess.trim().toUpperCase();
-        if (guess.length === 5 && words.includes(guess)) {
+        if (guess.length === 5 && (isCustomWord || words.includes(guess))) {
             checkGuess();
         } else {
             showInvalidMessage();
@@ -225,53 +288,6 @@ function showInvalidMessage() {
     setTimeout(() => {
         message.classList.remove('show');
     }, 2000);
-}
-
-function checkGuess() {
-    const boxes = document.querySelectorAll(`[data-row='${currentRow}']`);
-    const targetWordArray = targetWord.split('');
-    const guessArray = currentGuess.split('');
-
-    for (let i = 0; i < 5; i++) {
-        const char = guessArray[i];
-        const box = boxes[i];
-
-        if (char === targetWordArray[i]) {
-            box.classList.add('green');
-            targetWordArray[i] = null;
-            guessArray[i] = null;
-        }
-    }
-
-    for (let i = 0; i < 5; i++) {
-        const char = guessArray[i];
-        const box = boxes[i];
-
-        if (char && targetWordArray.includes(char)) {
-            box.classList.add('yellow');
-            targetWordArray[targetWordArray.indexOf(char)] = null;
-        } else if (char) {
-            box.classList.add('gray');
-        }
-    }
-
-    updateKeyboardColors();
-
-    if (currentGuess.trim() === targetWord) {
-        alert("Congratulations! You've guessed the word!");
-    } else if (currentRow < 5) {
-        currentRow++;
-        currentGuess = '';
-        const nextRowBoxes = document.querySelectorAll(`[data-row='${currentRow}']`);
-        nextRowBoxes.forEach(box => {
-            box.contentEditable = true;
-            box.addEventListener('input', handleInput);
-            box.addEventListener('keydown', handleKeyDown);
-        });
-        nextRowBoxes[0].focus();
-    } else {
-        alert(`Game over! The word was: ${targetWord}`);
-    }
 }
 
 let keyColorState = {};
@@ -338,4 +354,3 @@ function getColor(status) {
             return '#eee'; // Default background color
     }
 }
-

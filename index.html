@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <button class="menu-button" id="menu-button">
-        &#9776; <!-- Hamburger icon -->
-    </button>
+    <button class="menu-button" id="menu-button">&#9776;</button>
     <div class="dropdown-menu" id="dropdown-menu">
         <ul>
             <li><a href="#main">Main</a></li>
@@ -31,6 +29,10 @@
         </div>
         <div id="keyboard"></div>
         <div id="feedback"></div>
+    </div>
+    <div id="hint-popup" class="hint-popup hidden">
+        <span id="close-hint" class="close-button">&times;</span>
+        <div id="hint-message"></div>
     </div>
     <script src="script.js"></script>
 </body>
