@@ -63,9 +63,9 @@ Check out the live version of this project here: [Wordle Remake](<http://rapidon
 
 
 ## Future Updates:
--[ ] Score Keeper (logs to browser cookies, share with friends, etc)
--[ ] Online Leaderboard (new tab at the top)
-- Want anything added? Open an Issue, title it " **FEATURE ADDITION** " 
+- [] Score Keeper (logs to browser cookies, share with friends, etc)
+- [] Online Leaderboard (new tab at the top)
+- Want anything added? Open an Issue, title it " **FEATURE ADDITION** " and put whatever u want in the desc.
 
 
 ## Contributing

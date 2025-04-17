@@ -220,20 +220,16 @@ function checkGuess() {
     }
 }
 
+let keyColorState = {};
+
 function updateKeyboardColors() {
     const keys = document.querySelectorAll('.key');
-    const keyColors = {};
 
-    // Initialize keyColors with existing colors
+    // Initialize keyColorState with existing colors if not set
     keys.forEach(key => {
-        if (key.classList.contains('green')) {
-            keyColors[key.innerText] = 'green';
-        } else if (key.classList.contains('yellow')) {
-            keyColors[key.innerText] = 'yellow';
-        } else if (key.classList.contains('gray')) {
-            keyColors[key.innerText] = 'gray';
-        } else {
-            keyColors[key.innerText] = '';
+        const char = key.innerText;
+        if (!keyColorState[char]) {
+            keyColorState[char] = '';
         }
     });
 
@@ -244,7 +240,7 @@ function updateKeyboardColors() {
     for (let i = 0; i < 5; i++) {
         const char = guessArray[i];
         if (char === targetWordArray[i]) {
-            keyColors[char] = 'green';
+            keyColorState[char] = 'green';
             targetWordArray[i] = null;
             guessArray[i] = null;
         }
@@ -254,8 +250,8 @@ function updateKeyboardColors() {
     for (let i = 0; i < 5; i++) {
         const char = guessArray[i];
         if (char && targetWordArray.includes(char)) {
-            if (keyColors[char] !== 'green') {
-                keyColors[char] = 'yellow';
+            if (keyColorState[char] !== 'green') {
+                keyColorState[char] = 'yellow';
             }
             targetWordArray[targetWordArray.indexOf(char)] = null;
         }
@@ -264,18 +260,15 @@ function updateKeyboardColors() {
     // Third pass: assign gray if not already green or yellow
     for (let i = 0; i < 5; i++) {
         const char = guessArray[i];
-        if (char && !targetWordArray.includes(char) && keyColors[char] === '') {
-            keyColors[char] = 'gray';
+        if (char && !targetWordArray.includes(char) && keyColorState[char] === '') {
+            keyColorState[char] = 'gray';
         }
     }
 
     // Update the keyboard keys
     keys.forEach(key => {
         const char = key.innerText;
-        key.style.backgroundColor = ''; // Reset background color
-        if (keyColors[char]) {
-            key.style.backgroundColor = getColor(keyColors[char]);
-        }
+        key.style.backgroundColor = getColor(keyColorState[char]);
     });
 }
 
