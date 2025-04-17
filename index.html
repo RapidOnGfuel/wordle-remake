@@ -51,29 +51,5 @@
         <div id="feedback"></div>
     </div>
     <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            setupKeyboard();
-        });
-
-        const keyboardLayout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
-
-        function setupKeyboard() {
-            const keyboard = document.getElementById('keyboard');
-            keyboard.innerHTML = '';
-
-            keyboardLayout.forEach(row => {
-                const rowElement = document.createElement('div');
-                rowElement.classList.add('keyboard-row');
-                for (let char of row) {
-                    const key = document.createElement('div');
-                    key.classList.add('key');
-                    key.innerText = char;
-                    rowElement.appendChild(key);
-                }
-                keyboard.appendChild(rowElement);
-            });
-        }
-    </script>
 </body>
 </html>

@@ -222,23 +222,72 @@ function checkGuess() {
 
 function updateKeyboardColors() {
     const keys = document.querySelectorAll('.key');
-    keys.forEach(key => {
-        const char = key.innerText;
-        key.classList.remove('green', 'yellow', 'gray');
+    const keyColors = {};
 
-        if (currentGuess.includes(char)) {
-            if (targetWord.includes(char)) {
-                key.classList.add('yellow');
-            }
-            for (let i = 0; i < 5; i++) {
-                if (targetWord[i] === char && currentGuess[i] === char) {
-                    key.classList.remove('yellow');
-                    key.classList.add('green');
-                    break;
-                }
-            }
+    // Initialize keyColors with existing colors
+    keys.forEach(key => {
+        if (key.classList.contains('green')) {
+            keyColors[key.innerText] = 'green';
+        } else if (key.classList.contains('yellow')) {
+            keyColors[key.innerText] = 'yellow';
+        } else if (key.classList.contains('gray')) {
+            keyColors[key.innerText] = 'gray';
         } else {
-            key.classList.add('gray');
+            keyColors[key.innerText] = '';
         }
     });
+
+    const targetWordArray = targetWord.split('');
+    const guessArray = currentGuess.split('');
+
+    // First pass: check for green matches
+    for (let i = 0; i < 5; i++) {
+        const char = guessArray[i];
+        if (char === targetWordArray[i]) {
+            keyColors[char] = 'green';
+            targetWordArray[i] = null;
+            guessArray[i] = null;
+        }
+    }
+
+    // Second pass: check for yellow matches
+    for (let i = 0; i < 5; i++) {
+        const char = guessArray[i];
+        if (char && targetWordArray.includes(char)) {
+            if (keyColors[char] !== 'green') {
+                keyColors[char] = 'yellow';
+            }
+            targetWordArray[targetWordArray.indexOf(char)] = null;
+        }
+    }
+
+    // Third pass: assign gray if not already green or yellow
+    for (let i = 0; i < 5; i++) {
+        const char = guessArray[i];
+        if (char && !targetWordArray.includes(char) && keyColors[char] === '') {
+            keyColors[char] = 'gray';
+        }
+    }
+
+    // Update the keyboard keys
+    keys.forEach(key => {
+        const char = key.innerText;
+        key.style.backgroundColor = ''; // Reset background color
+        if (keyColors[char]) {
+            key.style.backgroundColor = getColor(keyColors[char]);
+        }
+    });
+}
+
+function getColor(status) {
+    switch (status) {
+        case 'green':
+            return '#6aaa64';
+        case 'yellow':
+            return '#c9b458';
+        case 'gray':
+            return '#787c7e';
+        default:
+            return '#eee'; // Default background color
+    }
 }
