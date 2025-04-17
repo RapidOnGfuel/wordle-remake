@@ -12,13 +12,67 @@ fetch('words.txt')
         newRandomWord();
     })
     .catch(error => console.error('Error loading words:', error));
-
-document.addEventListener('DOMContentLoaded', () => {
-    setupKeyboard();
-    setupBoard();
-    setupEventListeners();
-});
-
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        setupKeyboard();
+        setupBoard();
+        setupEventListeners();
+        loadStreak();
+    
+        const menuButton = document.getElementById('menu-button');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+    
+        menuButton.addEventListener('click', function() {
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+    
+        // Close the dropdown if clicked outside
+        window.addEventListener('click', function(event) {
+            if (!menuButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+    });
+    
+    let streak = 0;
+    
+    function loadStreak() {
+        const savedStreak = localStorage.getItem('wordle-streak');
+        streak = savedStreak ? parseInt(savedStreak, 10) : 0;
+        updateStreakDisplay();
+        console.log(`Loaded streak: ${streak}`);
+    }
+    
+    function updateStreakDisplay() {
+        const feedback = document.getElementById('feedback');
+        feedback.innerText = `Current Streak: ${streak}`;
+    }
+    
+    function checkGuess() {
+        if (currentGuess.trim() === targetWord) {
+            alert("Congratulations! You've guessed the word!");
+            streak++;
+            localStorage.setItem('wordle-streak', streak);
+            updateStreakDisplay();
+            console.log(`Streak incremented: ${streak}`);
+        } else if (currentRow < 5) {
+            currentRow++;
+            currentGuess = '';
+            const nextRowBoxes = document.querySelectorAll(`[data-row='${currentRow}']`);
+            nextRowBoxes.forEach(box => {
+                box.contentEditable = true;
+                box.addEventListener('input', handleInput);
+                box.addEventListener('keydown', handleKeyDown);
+            });
+            nextRowBoxes[0].focus();
+        } else {
+            alert(`Game over! The word was: ${targetWord}`);
+            streak = 0;
+            localStorage.setItem('wordle-streak', streak);
+            updateStreakDisplay();
+            console.log(`Streak reset: ${streak}`);
+        }
+    }
 function setupEventListeners() {
     document.getElementById('generate-code-button').addEventListener('click', generateCode);
     document.getElementById('start-game-button').addEventListener('click', startGame);
@@ -284,3 +338,4 @@ function getColor(status) {
             return '#eee'; // Default background color
     }
 }
+
